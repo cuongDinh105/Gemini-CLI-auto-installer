@@ -9,9 +9,9 @@ Công cụ tự động hóa việc cài đặt toàn bộ hệ sinh thái HexSt
 - Tự động cấu hình kết nối MCP giữa Gemini CLI và HexStrike AI.
 
 ## Cách sử dụng
-1. Tải script về:
+1. Tải script về từ repository của bạn:
    ```bash
-   wget https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/setup_hexstrike_gemini.py
+   wget https://raw.githubusercontent.com/cuongDinh105/Gemini-CLI-auto-installer/main/setup_hexstrike_gemini.py
    ```
 2. Chạy script:
    ```bash
@@ -26,3 +26,7 @@ Công cụ tự động hóa việc cài đặt toàn bộ hệ sinh thái HexSt
    cd hexstrike-ai
    python3 hexstrike_server.py
    ```
+
+## Repository chính thức
+- Script Installer: https://github.com/cuongDinh105/Gemini-CLI-auto-installer.git
+- HexStrike AI (Gốc): https://github.com/0x4m4/hexstrike-ai.git
