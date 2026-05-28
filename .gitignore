@@ -1,0 +1,11 @@
+.cache/
+.npm/
+.local/
+.config/
+.nvm/
+hexstrike-ai/hexstrike-env/
+__pycache__/
+*.pyc
+.tmp/
+*.log
+*.bak
