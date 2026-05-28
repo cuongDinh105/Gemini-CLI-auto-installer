@@ -172,6 +172,13 @@ def main():
             status_warn("Thư mục hexstrike-ai đã tồn tại. Cập nhật thay đổi mới nhất...")
             run_command(f"cd '{hexstrike_dir}' && git pull", "Cập nhật repository")
 
+        # Cài đặt bổ sung Anthropic-Cybersecurity-Skills
+        skills_dir = os.path.join(current_dir, "anthropic-cybersecurity-skills")
+        if not os.path.exists(skills_dir):
+            run_command(f"git clone https://github.com/mukul975/Anthropic-Cybersecurity-Skills.git '{skills_dir}'", "Clone Anthropic-Cybersecurity-Skills")
+        else:
+            run_command(f"cd '{skills_dir}' && git pull", "Cập nhật Anthropic-Cybersecurity-Skills")
+
         print("")
         status_info("Cài đặt môi trường ảo và các gói phụ thuộc...")
         os.chdir(hexstrike_dir)
