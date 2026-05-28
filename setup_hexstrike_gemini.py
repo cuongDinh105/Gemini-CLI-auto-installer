@@ -71,68 +71,55 @@ def get_latest_gemini_version():
 def configure_mcp(home, hexstrike_dir, port):
     """Cấu hình MCP và tự động sao lưu file settings.json."""
     print("")
-    status_info("=== Đang bắt đầu cấu hình MCP ===")
-    status_info("Hệ thống sẽ đăng ký các MCP Server vào Gemini CLI settings.")
+    status_info("=== Đang bắt đầu cấu hình MCP nâng cao ===")
     
     gemini_config_dir = os.path.join(home, ".gemini")
     os.makedirs(gemini_config_dir, exist_ok=True)
     
     settings_path = os.path.join(gemini_config_dir, "settings.json")
     
-    # Tự động sao lưu cấu hình
     if os.path.exists(settings_path):
-        backup_path = settings_path + ".bak"
-        status_info(f"Sao lưu cấu hình hiện tại vào '{backup_path}'...")
-        try:
-            shutil.copyfile(settings_path, backup_path)
-            status_ok("Sao lưu thành công.")
-        except Exception as e:
-            status_err(f"Cảnh báo: Không thể sao lưu file settings.json: {e}")
+        shutil.copyfile(settings_path, settings_path + ".bak")
 
     python_executable = os.path.join(hexstrike_dir, "hexstrike-env/bin/python3")
     mcp_script_path = os.path.join(hexstrike_dir, "hexstrike_mcp.py")
 
-    status_info("Đang định nghĩa cấu hình cho các MCP Server...")
+    # Cấu hình các MCP Server mới
     mcp_config = {
         "hexstrike-ai": {
             "command": python_executable,
             "args": [mcp_script_path, "--server", f"http://localhost:{port}"],
             "trust": True
         },
-        "agentmemory": {
-            "command": "npx",
-            "args": [
-                "-y",
-                "@agentmemory/mcp"
-            ]
-        }
+        "agentmemory": {"command": "npx", "args": ["-y", "@agentmemory/mcp"]},
+        "filesystem": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/kali/"]},
+        "sqlite": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-sqlite", "/home/kali/pentest/results.db"]},
+        "fetch": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-fetch"]}
     }
-    status_ok("Đã định nghĩa: hexstrike-ai và agentmemory.")
 
-    settings = {}
+    settings = {"mcpServers": {}}
     if os.path.exists(settings_path):
         with open(settings_path, 'r') as f:
-            try:
-                settings = json.load(f)
-                status_info("Đã tải cấu hình hiện có từ settings.json.")
-            except json.JSONDecodeError:
-                status_warn("File settings.json không hợp lệ, tạo cấu hình mới.")
-                settings = {}
+            try: settings = json.load(f)
+            except: pass
 
-    if "mcpServers" not in settings:
-        settings["mcpServers"] = {}
-        status_info("Đã tạo mục 'mcpServers' mới.")
-    
     settings["mcpServers"].update(mcp_config)
 
     with open(settings_path, 'w') as f:
         json.dump(settings, f, indent=2)
     
-    status_ok(f"Cấu hình MCP đã được lưu tại: {settings_path}")
-    status_info("--- Thông tin các MCP Server đã cài đặt: ---")
-    for name, config in mcp_config.items():
-        print(f"    - {name}: {config['command']}")
-    print("")
+    status_ok("Đã cấu hình các MCP: hexstrike-ai, agentmemory, filesystem, sqlite, fetch.")
+
+def install_pentest_tools():
+    """Cài đặt các công cụ pentest thiết yếu."""
+    status_info("=== Đang cài đặt công cụ Pentest ===")
+    tools = [
+        "nuclei", "subfinder", "httpx", "ffuf", "sqlmap", "dalfox", "arjun"
+    ]
+    # Giả định dùng go install cho các tool phổ biến
+    for tool in tools:
+        run_command(f"go install -v github.com/projectdiscovery/{tool}/cmd/{tool}@latest", f"Cài đặt {tool}")
+    run_command("sudo apt-get install -y sqlmap ghidra radare2", "Cài đặt các công cụ hệ thống")
 
 def main():
     parser = argparse.ArgumentParser(description="HexStrike AI & Gemini CLI Auto Installer")

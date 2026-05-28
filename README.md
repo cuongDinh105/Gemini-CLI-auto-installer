@@ -1,38 +1,31 @@
-# Gemini-CLI-auto-installer
+# Gemini-CLI-auto-installer (Pentest Edition)
 
-Đây là công cụ tự động hóa quá trình cài đặt và cấu hình **Gemini CLI** kết hợp với các **MCP (Model Context Protocol)** server mạnh mẽ, tạo ra môi trường làm việc chuyên nghiệp cho các tác vụ Pentest và tự động hóa AI.
-
----
-
-## 1. Các thành phần được cài đặt
-
-### A. Gemini CLI (@google/gemini-cli)
-- **Chức năng:** Giao diện dòng lệnh chính để tương tác với các mô hình ngôn ngữ lớn (LLM) của Google.
-- **Vai trò:** Điều phối các yêu cầu và kết nối với các công cụ hỗ trợ thông qua giao thức MCP.
-
-### B. HexStrike AI (HexStrike-AI)
-- **Chức năng:** Bộ công cụ Pentest nâng cao được tích hợp dưới dạng MCP Server.
-- **Tính năng:**
-    - Quét mạng, quét lỗ hổng (nmap, nuclei, trivy,...).
-    - Khai thác lỗ hổng (sqlmap, metasploit).
-    - Phân tích mã nhị phân, reverse engineering (ghidra, radare2).
-    - OSINT và thu thập thông tin mục tiêu.
-
-### C. AgentMemory MCP Server
-- **Chức năng:** Cung cấp khả năng ghi nhớ cho các tác nhân AI.
-- **Vai trò:** Lưu trữ, truy xuất ngữ cảnh và các thông tin quan trọng trong quá trình làm việc, giúp AI duy trì sự nhất quán qua nhiều phiên làm việc.
+Đây là công cụ tự động hóa toàn diện để biến Gemini CLI thành một **Nền tảng Pentest Tự động** (Autonomous Pentesting Platform).
 
 ---
 
-## 2. Yêu cầu hệ thống
-- Hệ điều hành: Linux (khuyên dùng Kali Linux).
-- Python 3.x
-- Node.js & npm (để cài đặt Gemini CLI và AgentMemory).
-- Git.
+## 1. Công cụ & Thành phần tích hợp
+
+### Pentest Tools (Tự động cài đặt)
+- **ProjectDiscovery Suite**: `nuclei` (quét lỗ hổng), `subfinder` (recon), `httpx` (prober), `ffuf` (fuzzing), `dalfox` (XSS), `arjun` (param discovery).
+- **Hệ thống**: `sqlmap` (khai thác SQLi), `ghidra` (reverse engineering), `radare2` (phân tích binary).
+
+### MCP Servers (Tự động đăng ký)
+- `hexstrike-ai`: Server điều khiển các công cụ pentest.
+- `agentmemory`: Lưu trữ ngữ cảnh dự án và bộ nhớ cho AI.
+- `filesystem`: Truy cập đọc/ghi file báo cáo/log trực tiếp.
+- `sqlite`: Truy vấn database kết quả pentest (`results.db`).
+- `fetch`: Truy cập tài liệu bảo mật trực tuyến.
+
+### Skills Nâng cao
+- `automated-api-audit`: Tự động audit API bằng chuỗi công cụ `httpx` + `arjun` + `nuclei`.
+- `recon-workflow`: Quy trình tự động từ subdomain đến báo cáo lỗ hổng.
+- `binary-exploitation-triage`: Tự động phân tích binary.
+- `cloud-threat-hunting`: Phân tích logs AWS/Azure để tìm dấu hiệu xâm nhập.
 
 ---
 
-## 3. Cách cài đặt
+## 2. Cài đặt
 
 1. **Clone dự án:**
    ```bash
@@ -40,38 +33,22 @@
    cd Gemini-CLI-auto-installer
    ```
 
-2. **Chạy script tự động cài đặt:**
+2. **Chạy script (tự động cài đặt tool và cấu hình MCP):**
    ```bash
    python3 setup_hexstrike_gemini.py
    ```
-   *Script sẽ tự động:* 
-   - Kiểm tra và cập nhật Gemini CLI.
-   - Clone repository HexStrike AI.
-   - Tạo môi trường ảo Python và cài đặt thư viện.
-   - Cấu hình các MCP Server vào `~/.gemini/settings.json`.
 
 ---
 
-## 4. Cách sử dụng
+## 3. Cách sử dụng
 
-### BƯỚC 1: Đăng nhập
-Đảm bảo bạn đã đăng nhập vào Gemini CLI:
-```bash
-gemini login
-```
-
-### BƯỚC 2: Khởi chạy HexStrike Server
-Để các công cụ pentest có thể giao tiếp với AI, bạn cần chạy HexStrike server riêng biệt:
-```bash
-cd hexstrike-ai
-python3 hexstrike_server.py --port 8888
-```
-
-### BƯỚC 3: Sử dụng cùng AI
-Khi đã chạy server, bạn có thể gọi trực tiếp các công cụ pentest ngay trong phiên trò chuyện của Gemini CLI:
-*Ví dụ: "Hãy quét cổng mục tiêu 192.168.1.1"* (AgentMemory sẽ ghi nhớ tiến trình, HexStrike thực hiện tác vụ).
+1. **Đăng nhập:** `gemini login`
+2. **Khởi chạy HexStrike Server:** `cd hexstrike-ai && python3 hexstrike_server.py --port 8888`
+3. **Tác vụ Pentest:**
+   - Hỏi AI: *"Quét lỗ hổng API tại mục tiêu [URL]"* -> AI sẽ tự động kích hoạt workflow API Audit.
+   - Hỏi AI: *"Liệt kê danh sách endpoint đã tìm thấy"* -> AI truy vấn SQLite/Filesystem để đưa ra báo cáo.
 
 ---
 
-## 5. Quản lý cấu hình
-Các MCP Server được quản lý trong file: `~/.gemini/settings.json`. Nếu cần tùy chỉnh thêm, bạn có thể chỉnh sửa trực tiếp file này.
+## 4. Quản lý
+Toàn bộ cấu hình MCP nằm tại `~/.gemini/settings.json`.
