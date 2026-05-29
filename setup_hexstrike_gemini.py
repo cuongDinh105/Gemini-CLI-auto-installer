@@ -78,13 +78,37 @@ def configure_mcp(home, hexstrike_dir, port):
     
     settings_path = os.path.join(gemini_config_dir, "settings.json")
     
+    # Tự động sao lưu cấu hình
     if os.path.exists(settings_path):
-        shutil.copyfile(settings_path, settings_path + ".bak")
+        backup_path = settings_path + ".bak"
+        status_info(f"Sao lưu cấu hình hiện tại vào '{backup_path}'...")
+        try:
+            shutil.copyfile(settings_path, backup_path)
+            status_ok("Sao lưu thành công.")
+        except Exception as e:
+            status_err(f"Cảnh báo: Không thể sao lưu file settings.json: {e}")
+
+    # Đảm bảo cấu hình là một dictionary hợp lệ
+    settings = {}
+    if os.path.exists(settings_path):
+        with open(settings_path, 'r') as f:
+            try:
+                settings = json.load(f)
+            except json.JSONDecodeError:
+                status_warn("File settings.json không hợp lệ, tạo cấu hình mới.")
+                settings = {}
+
+    if not isinstance(settings, dict):
+        settings = {}
+        
+    if "mcpServers" not in settings or not isinstance(settings["mcpServers"], dict):
+        settings["mcpServers"] = {}
+        status_info("Đã khởi tạo mục 'mcpServers' trong settings.")
 
     python_executable = os.path.join(hexstrike_dir, "hexstrike-env/bin/python3")
     mcp_script_path = os.path.join(hexstrike_dir, "hexstrike_mcp.py")
 
-    # Cấu hình các MCP Server mới
+    # Cấu hình các MCP Server
     mcp_config = {
         "hexstrike-ai": {
             "command": python_executable,
@@ -96,19 +120,17 @@ def configure_mcp(home, hexstrike_dir, port):
         "sqlite": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-sqlite", "/home/kali/pentest/results.db"]},
         "fetch": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-fetch"]}
     }
-
-    settings = {"mcpServers": {}}
-    if os.path.exists(settings_path):
-        with open(settings_path, 'r') as f:
-            try: settings = json.load(f)
-            except: pass
-
+    
     settings["mcpServers"].update(mcp_config)
 
     with open(settings_path, 'w') as f:
         json.dump(settings, f, indent=2)
     
-    status_ok("Đã cấu hình các MCP: hexstrike-ai, agentmemory, filesystem, sqlite, fetch.")
+    status_ok(f"Cấu hình MCP đã được lưu tại: {settings_path}")
+    status_info("--- Thông tin các MCP Server đã cài đặt: ---")
+    for name, config in mcp_config.items():
+        print(f"    - {name}: {config['command']}")
+    print("")
 
 def install_pentest_tools():
     """Cài đặt các công cụ pentest thiết yếu."""
