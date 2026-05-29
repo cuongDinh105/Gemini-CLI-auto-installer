@@ -1,26 +1,51 @@
 # Gemini-CLI-auto-installer (Pentest Edition)
 
-Đây là công cụ tự động hóa toàn diện để biến Gemini CLI thành một **Nền tảng Pentest Tự động** (Autonomous Pentesting Platform) chuyên nghiệp.
+Đây là nền tảng **Pentest Tự động (Autonomous Pentesting Platform)**, tích hợp Gemini CLI cùng các công cụ bảo mật chuyên dụng và MCP Servers để tối ưu hóa quy trình kiểm thử.
 
 ---
 
-## 1. Các thành phần chính
+## 1. Thành phần Tích hợp
 
-### Pentest Tools (Tự động cài đặt)
-- **Công cụ Quét & Recon**: `nuclei` (vulnerability scanner), `subfinder` (subdomain enum), `httpx` (HTTP prober), `ffuf` (fuzzing), `dalfox` (XSS), `arjun` (parameter discovery).
-- **Công cụ Khai thác & Phân tích**: `sqlmap` (SQLi), `ghidra` (reverse engineering), `radare2` (binary analysis).
+### 🛠 Pentest Tools (Tự động cài đặt)
+- **Recon**: `nuclei`, `subfinder`, `httpx`, `ffuf`, `dalfox`, `arjun`.
+- **Exploit & Analysis**: `sqlmap`, `ghidra`, `radare2`.
 
-### MCP Servers (Tự động đăng ký)
-- `hexstrike-ai`: Điều khiển các công cụ pentest.
-- `agentmemory`: Quản lý bộ nhớ ngữ cảnh và lịch sử dự án.
-- `filesystem`, `sqlite`, `fetch`: Hỗ trợ quản lý báo cáo, truy vấn kết quả và tra cứu tài liệu.
-
-### Anthropic Cybersecurity Skills
-Dự án tự động tích hợp kho kỹ năng bảo mật từ [Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills.git). Đây là kho tài nguyên quý giá để Gemini AI học hỏi cách thực hiện các kỹ thuật bảo mật từ cơ bản đến nâng cao.
+### 🔌 MCP Servers (Giao diện điều khiển AI)
+- `hexstrike-ai`: Server điều khiển trực tiếp các tool pentest qua lệnh AI.
+- `agentmemory`: Ghi nhớ ngữ cảnh, kết quả quét và các phát hiện quan trọng.
+- `filesystem`: Đọc/ghi các file báo cáo, log, script trực tiếp vào máy.
+- `sqlite`: Truy vấn dữ liệu từ các file kết quả `.db`.
+- `fetch`: Tra cứu nhanh tài liệu bảo mật, blog, hoặc kỹ thuật tấn công mới nhất.
 
 ---
 
-## 2. Cài đặt
+## 2. Hướng dẫn sử dụng chi tiết
+
+### A. Sử dụng MCP Servers
+Bạn có thể ra lệnh cho AI gọi các server này:
+
+| MCP Server | Mục đích | Ví dụ lệnh yêu cầu AI |
+| :--- | :--- | :--- |
+| `filesystem` | Đọc báo cáo | "Đọc file `vulnerabilities.txt` và tóm tắt lỗ hổng nghiêm trọng" |
+| `sqlite` | Query dữ liệu | "Truy vấn các subdomain đã tìm thấy trong `results.db`" |
+| `fetch` | Tra cứu kỹ thuật | "Tìm tài liệu về CVE-2023-xxxx từ Google" |
+| `agentmemory`| Ghi nhớ | "Ghi nhớ rằng mục tiêu hiện tại là vanphongso.bvmat.vn" |
+
+### B. Sử dụng các Skills nâng cao
+Các skills này giúp tự động hóa quy trình:
+
+1. **`recon-workflow`**: Tự động hóa recon từ A-Z.
+   - *Yêu cầu AI:* "Chạy recon-workflow cho mục tiêu [domain]"
+2. **`automated-api-audit`**: Quét lỗ hổng API chuyên sâu.
+   - *Yêu cầu AI:* "Thực hiện automated-api-audit cho [URL]"
+3. **`binary-exploitation-triage`**: Phân tích file binary.
+   - *Yêu cầu AI:* "Phân tích binary [file_path] bằng skill binary-exploitation-triage"
+4. **`cloud-threat-hunting`**: Hunting trên môi trường Cloud.
+   - *Yêu cầu AI:* "Chạy cloud-threat-hunting trên cấu hình AWS hiện tại"
+
+---
+
+## 3. Cài đặt & Khởi chạy
 
 1. **Clone dự án:**
    ```bash
@@ -28,28 +53,20 @@ Dự án tự động tích hợp kho kỹ năng bảo mật từ [Anthropic-Cyb
    cd Gemini-CLI-auto-installer
    ```
 
-2. **Chạy script (tự động cài đặt tool, clone skills và cấu hình MCP):**
+2. **Cài đặt:**
    ```bash
-   python3 setup_hexstrike_gemini.py
+   python3 setup_hexstrike_gemini.py --force-reinstall
    ```
+   *(Chọn công cụ CLI bạn muốn sử dụng: Gemini, Claude hoặc Codex).*
 
----
-
-## 3. Cách sử dụng
-
-1. **Đăng nhập:** `gemini login`
-2. **Khởi chạy HexStrike Server:**
+3. **Khởi chạy HexStrike Server:**
    ```bash
    cd hexstrike-ai
    python3 hexstrike_server.py --port 8888
    ```
-3. **Thực thi Pentest:**
-   - Sử dụng workflow tự động: `python3 pentest_workflow.py <domain>`
-   - Hoặc yêu cầu trực tiếp với AI để kết hợp các Skills đã được cài đặt.
 
 ---
 
-## 4. Quản lý
-- **MCP Config:** `~/.gemini/settings.json`
-- **Kỹ năng bảo mật:** Thư mục `anthropic-cybersecurity-skills/`
-- **Công cụ:** Đã được đưa vào PATH hệ thống (thường thông qua `$HOME/go/bin`).
+## 4. Lưu ý
+- Mọi cấu hình kết nối MCP nằm tại `~/.gemini/settings.json` (hoặc `.claude`, `.codex` tùy lựa chọn).
+- Hãy đảm bảo bạn đã cấp quyền chạy file thực thi trong thư mục `hexstrike-ai`.
