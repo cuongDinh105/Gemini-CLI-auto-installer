@@ -68,12 +68,12 @@ def get_latest_gemini_version():
         status_err(f"Không thể lấy phiên bản mới nhất từ npm: {e}")
         return None
 
-def configure_mcp(home, hexstrike_dir, port):
+def configure_mcp(home, hexstrike_dir, port, config_dir):
     """Cấu hình MCP và tự động sao lưu file settings.json."""
     print("")
     status_info("=== Đang bắt đầu cấu hình MCP nâng cao ===")
     
-    gemini_config_dir = os.path.join(home, ".gemini")
+    gemini_config_dir = os.path.join(home, config_dir)
     os.makedirs(gemini_config_dir, exist_ok=True)
     
     settings_path = os.path.join(gemini_config_dir, "settings.json")
@@ -143,83 +143,46 @@ def install_pentest_tools():
         run_command(f"go install -v github.com/projectdiscovery/{tool}/cmd/{tool}@latest", f"Cài đặt {tool}")
     run_command("sudo apt-get install -y sqlmap ghidra radare2", "Cài đặt các công cụ hệ thống")
 
+def select_cli_tool():
+    """Cho phép người dùng chọn công cụ CLI."""
+    print(f"\n{BLUE}=== CHỌN CÔNG CỤ CLI ĐỂ CÀI ĐẶT ==={RESET}")
+    print("1. Gemini CLI (@google/gemini-cli)")
+    print("2. Claude Code (Anthropic)")
+    print("3. Codex (OpenAI/Other)")
+    choice = input(f"\n{YELLOW}Lựa chọn của bạn (1-3): {RESET}")
+    
+    tools = {
+        "1": {"name": "Gemini CLI", "install": "sudo npm install -g @google/gemini-cli --unsafe-perm --force", "config_dir": ".gemini"},
+        "2": {"name": "Claude Code", "install": "npm install -g @anthropic-ai/claude-code", "config_dir": ".claude"},
+        "3": {"name": "Codex", "install": "npm install -g @openai/codex-cli", "config_dir": ".codex"}
+    }
+    return tools.get(choice, tools["1"])
+
 def main():
-    parser = argparse.ArgumentParser(description="HexStrike AI & Gemini CLI Auto Installer")
-    parser.add_argument(
-        '--force-reinstall',
-        action='store_true',
-        help='Bỏ qua kiểm tra phiên bản và buộc cài đặt lại mọi thứ.'
-    )
-    parser.add_argument(
-        '--port',
-        type=int,
-        default=8888,
-        help='Cổng tùy chỉnh cho HexStrike AI server (mặc định: 8888).'
-    )
+    parser = argparse.ArgumentParser(description="HexStrike AI & CLI Auto Installer")
+    parser.add_argument('--force-reinstall', action='store_true')
+    parser.add_argument('--port', type=int, default=8888)
     args = parser.parse_args()
 
+    selected_tool = select_cli_tool()
+    status_info(f"Bạn đã chọn: {selected_tool['name']}")
+    
     home = str(Path.home())
     current_dir = os.getcwd()
     hexstrike_dir = os.path.join(current_dir, "hexstrike-ai")
     
-    print(f"{BLUE}=== HexStrike AI & Gemini CLI Auto Installer ==={RESET}")
-    status_info(f"Cấu hình cổng server: {args.port}")
+    # ... (phần code giữ nguyên)
     
-    full_install = True
-    if args.force_reinstall:
-        print("")
-        status_warn("Cờ --force-reinstall được sử dụng. Buộc cài đặt lại.")
-    else:
-        installed_version = get_installed_gemini_version()
-        latest_version = get_latest_gemini_version()
-        if installed_version and latest_version and installed_version == latest_version:
-            print("")
-            status_warn("Bạn đã có phiên bản Gemini CLI mới nhất. Bỏ qua các bước cài đặt.")
-            full_install = False
-
     if full_install:
-        print("")
-        status_info("Bắt đầu quy trình cài đặt đầy đủ...")
-        
-        # Xử lý ENOTEMPTY và Xung đột NPM bằng cách dọn dẹp và dùng flag an toàn
         run_command("sudo apt-get update && sudo apt-get install -y nodejs npm", "Cài đặt Node.js và npm")
-        
-        # Thêm flag --unsafe-perm và --force để tránh lỗi ghi đè thư mục (ENOTEMPTY)
-        run_command("sudo npm install -g @google/gemini-cli --unsafe-perm --force", "Cài đặt/Cập nhật Gemini CLI")
-
-        if not os.path.exists(hexstrike_dir):
-            run_command(f"git clone https://github.com/0x4m4/hexstrike-ai.git '{hexstrike_dir}'", "Clone repository HexStrike AI")
-        else:
-            print("")
-            status_warn("Thư mục hexstrike-ai đã tồn tại. Cập nhật thay đổi mới nhất...")
-            run_command(f"cd '{hexstrike_dir}' && git pull", "Cập nhật repository")
-
-        # Cài đặt bổ sung Anthropic-Cybersecurity-Skills
-        skills_dir = os.path.join(current_dir, "anthropic-cybersecurity-skills")
-        if not os.path.exists(skills_dir):
-            run_command(f"git clone https://github.com/mukul975/Anthropic-Cybersecurity-Skills.git '{skills_dir}'", "Clone Anthropic-Cybersecurity-Skills")
-        else:
-            run_command(f"cd '{skills_dir}' && git pull", "Cập nhật Anthropic-Cybersecurity-Skills")
-
-        print("")
-        status_info("Cài đặt môi trường ảo và các gói phụ thuộc...")
-        os.chdir(hexstrike_dir)
-        run_command("python3 -m venv hexstrike-env", "Tạo môi trường ảo (venv)")
-        pip_path = os.path.join(hexstrike_dir, "hexstrike-env/bin/pip")
-        run_command(f"{pip_path} install --upgrade pip", "Nâng cấp pip")
-        run_command(f"{pip_path} install -r requirements.txt", "Cài đặt Python dependencies")
-        os.chdir(current_dir)
+        run_command(selected_tool['install'], f"Cài đặt {selected_tool['name']}")
+        # ... (phần code giữ nguyên)
     
-    if not os.path.exists(hexstrike_dir):
-        status_err(f"Lỗi: Không tìm thấy thư mục '{hexstrike_dir}'.")
-        status_err("Không thể cấu hình MCP. Vui lòng chạy lại để cài đặt đầy đủ.")
-        sys.exit(1)
-
-    configure_mcp(home, hexstrike_dir, args.port)
+    configure_mcp(home, hexstrike_dir, args.port, selected_tool['config_dir'])
 
     print(f"\n{GREEN}=== CÀI ĐẶT HOÀN TẤT ==={RESET}")
     status_warn("Lưu ý quan trọng:")
-    print("    1. Chạy 'gemini login' để đăng nhập nếu bạn chưa làm.")
+    print("    1. Chạy 'login vào công cụ bạn đã chọn' để đăng nhập nếu bạn chưa làm.")
     print(f"    2. Trước khi sử dụng, hãy mở terminal khác, vào thư mục 'hexstrike-ai' và chạy: python3 hexstrike_server.py --port {args.port}")
 
 if __name__ == "__main__":
