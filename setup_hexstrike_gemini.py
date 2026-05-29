@@ -171,8 +171,20 @@ def main():
     current_dir = os.getcwd()
     hexstrike_dir = os.path.join(current_dir, "hexstrike-ai")
     
-    # ... (phần code giữ nguyên)
+    print(f"{BLUE}=== HexStrike AI & {selected_tool['name']} Auto Installer ==={RESET}")
+    status_info(f"Cấu hình cổng server: {args.port}")
     
+    full_install = True
+    if args.force_reinstall:
+        print("")
+        status_warn("Cờ --force-reinstall được sử dụng. Buộc cài đặt lại.")
+    else:
+        # Kiểm tra nếu đã cài đặt rồi
+        if os.path.exists(hexstrike_dir):
+            print("")
+            status_warn("Bạn đã có thư mục hexstrike-ai. Bỏ qua các bước cài đặt.")
+            full_install = False
+
     if full_install:
         run_command("sudo apt-get update && sudo apt-get install -y nodejs npm", "Cài đặt Node.js và npm")
         run_command(selected_tool['install'], f"Cài đặt {selected_tool['name']}")
