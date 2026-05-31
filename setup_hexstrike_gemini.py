@@ -148,13 +148,11 @@ def select_cli_tool():
     print(f"\n{BLUE}=== CHỌN CÔNG CỤ CLI ĐỂ CÀI ĐẶT ==={RESET}")
     print("1. Gemini CLI (@google/gemini-cli)")
     print("2. Claude Code (Anthropic)")
-    print("3. Codex (OpenAI/Other)")
-    choice = input(f"\n{YELLOW}Lựa chọn của bạn (1-3): {RESET}")
+    choice = input(f"\n{YELLOW}Lựa chọn của bạn (1-2): {RESET}")
     
     tools = {
         "1": {"name": "Gemini CLI", "install": "sudo npm install -g @google/gemini-cli --unsafe-perm --force", "config_dir": ".gemini"},
-        "2": {"name": "Claude Code", "install": "npm install -g @anthropic-ai/claude-code", "config_dir": ".claude"},
-        "3": {"name": "Codex", "install": "npm install -g @openai/codex-cli", "config_dir": ".codex"}
+        "2": {"name": "Claude Code", "install": "npm install -g @anthropic-ai/claude-code", "config_dir": ".claude"}
     }
     return tools.get(choice, tools["1"])
 
